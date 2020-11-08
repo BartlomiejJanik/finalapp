@@ -8,8 +8,10 @@ import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class CategoryDAO { //data access object
+/*data access object*/ /*SINGLETON*/
+public class CategoryDAO {
     private static CategoryDAO INSTANCE;
+
     private List<Category> categoryList = populateCategories();
 
     private CategoryDAO() {
@@ -30,41 +32,41 @@ public class CategoryDAO { //data access object
         return INSTANCE;
     }
 
+
     private List<Category> populateCategories() {
-        List<String> categoryText;
+        List<String> categoriesText;
         ClassLoader classLoader = this.getClass().getClassLoader();
         URL resourceURL = classLoader.getResource("categories.txt");
+
         try {
-            categoryText = Files.readAllLines(Paths.get(resourceURL.toURI()));
+            categoriesText = Files.readAllLines(Paths.get(resourceURL.toURI()));
         } catch (IOException | URISyntaxException e) {
             e.printStackTrace();
-            categoryText = Collections.EMPTY_LIST;
+            categoriesText = Collections.EMPTY_LIST;
         }
 
-
-        List<Category> listCategories = categoryText.stream()
+        List<Category> listCategories = categoriesText.stream()
                 .map(t -> Category.applyFromText(t))
                 .collect(Collectors.toList());
 
-        /*Map<Integer, List<Category>> categoriesMap = new HashMap<>();
-        for (Category lc : ListCategories) {
-            if (categoriesMap.containsKey(lc.getDepth())) {
-                List<Category> innerList = categoriesMap.get(lc.getDepth());
-                innerList.add(lc);
+        Map<Integer, List<Category>> categoriesMap = listCategories.stream()
+                .collect(Collectors.groupingBy(e -> e.getDepth()));
+
+/*        for (Category lC : listCategories) {
+            if (categoriesMap.containsKey(lC.getDepth())) {
+                List<Category> innerList = categoriesMap.get(lC.getDepth());
+                innerList.add(lC);
             } else {
                 List<Category> innerList = new ArrayList<>();
-                innerList.add(lc);
-                categoriesMap.put(lc.getDepth(), innerList);
+                innerList.add(lC);
+                categoriesMap.put(lC.getDepth(), innerList);
             }
-
         }*/
-        Map<Integer, List<Category>> categoriesMap = listCategories
-                .stream().collect(Collectors.groupingBy(e -> e.getDepth()));
 
         populateParentId(0, categoriesMap);
 
-
         return listCategories;
+
     }
 
     private void populateParentId(int depth, Map<Integer, List<Category>> categoriesMap) {
@@ -75,22 +77,21 @@ public class CategoryDAO { //data access object
         }
         if (depth > 0) {
             for (Category child : children) {
-                Integer parentId = chooseParent(parents, child);
-                child.setParentId(parentId);
+                chooseParent(parents, child);
             }
         }
         populateParentId(depth + 1, categoriesMap);
 
     }
 
-    private Integer chooseParent(List<Category> parents, Category child) {
+    private void chooseParent(List<Category> parents, Category child) {
         Integer childId = child.getId();
         Integer parentId = parents.stream()
                 .map(e -> e.getId())
                 .filter(id -> id < childId)
                 .sorted((a, b) -> b - a)
                 .findFirst()
-                .orElseThrow(() -> new RuntimeException("nie znaleziono rodzica!"));
-        return parentId;
+                .orElseThrow(() -> new RuntimeException("Nie znaleziono rodzica"));
+        child.setParentId(parentId);
     }
 }

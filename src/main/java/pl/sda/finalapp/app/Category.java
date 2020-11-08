@@ -1,6 +1,6 @@
 package pl.sda.finalapp.app;
 
-// domenowy model danych
+/* domenowy model danych */
 public class Category {
     private Integer id;
     private Integer parentId;
@@ -8,19 +8,20 @@ public class Category {
     private Integer depth;
     private static Integer idCounter = 0;
 
-    public static Category applyFromText(String text) {
+
+    public static Category applyFromText(String t){
         Category category = new Category();
-        category.categoryName = text.trim();
+        category.categoryName = t.trim();
         category.id = ++idCounter;
-        category.depth = calculateDepth(text);
+        category.depth = calculateDepth(t);
         return category;
     }
 
-    private static int calculateDepth(String text) {
-        if (!text.startsWith(" ")) {
+    private static int calculateDepth(String t) {
+        if(!t.startsWith(" ")){
             return 0;
         }
-        return text.split("\\S+")[0].length();
+        return t.split("\\S+")[0].length();
     }
 
     public void setParentId(Integer parentId) {
@@ -43,7 +44,7 @@ public class Category {
         return depth;
     }
 
-    public static Integer getIdCounter() {
-        return idCounter;
+    public CategoryDTO toDTO(){
+        return new CategoryDTO(id, parentId,categoryName);
     }
 }
