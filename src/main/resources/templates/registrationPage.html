@@ -1,12 +1,29 @@
 <!DOCTYPE html>
-<html lang="en">
+<html xmlns:th="http://www.thymeleaf.org" lang="pl">
 <head>
     <meta charset="UTF-8">
     <title>Registration</title>
 </head>
 <body>
-<form>
+<form th:object="${userRegistrationData}" action="/registration" method="post">
+    <input th:field="*{firstName}">
+    <input th:field="*{lastName}">
+    <input th:field="*{eMail}">
+    <input th:field="*{passwordHash}">
+    <input th:field="*{city}">
+    <select th:field="*{country}">
+<!--        <option th:value="''" th:text="Wybierz kraj"></option>-->
+<!--        <option th:each="c : ${countryList}" th:value="${c.symbol}" th:text="${c.countryName}"></option>-->
+        <option th:value="''" th:text="Wybierz"></option>
+        <option th:each="c : ${countryList}" th:value="${c.symbol}" th:text="${c.countryName}"></option>
 
+    </select>
+    <input th:field="*{zipCode}">
+    <input th:field="*{street}">
+    <input th:field="*{birthDate}">
+    <input th:field="*{pesel}">
+    <input th:field="*{phone}">
+    <button>Zarejestruj</button>
 </form>
 
 </body>
